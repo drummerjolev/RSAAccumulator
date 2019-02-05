@@ -1,3 +1,7 @@
+# Fork 🍴 Information
+
+This repo was forked to integrate with E-cclesia, an Ethereum-based voting protocol. The RSA accumulator is used as-is from the forked repo.
+
 # Description
 
 Quick and dirty implementation of RSA accumulator for Plasma history reduction needs. The main problem is mapping of various IDs to primes (that is required for accumulator)
@@ -21,7 +25,7 @@ where the `isPrime` function should do a Fermat test for a prime (it's relativel
 Another option is a list of roughly 2^40 precomputed primes committed in form of a Merkle tree, so mapping is done by proving tree membership and position.
 
 ## Inclusion and non-inclusion schemes
-For understanding how it works from the Vitalik's [post](https://ethresear.ch/t/rsa-accumulators-for-plasma-cash-history-reduction/3739). RSA accumulators allow to prove that some prime number was or was not included in a set. It's also possible to prove non-inclusion for a (small) set of primes. 
+For understanding how it works from the Vitalik's [post](https://ethresear.ch/t/rsa-accumulators-for-plasma-cash-history-reduction/3739). RSA accumulators allow to prove that some prime number was or was not included in a set. It's also possible to prove non-inclusion for a (small) set of primes.
 
 **Inclusion proof**
 
