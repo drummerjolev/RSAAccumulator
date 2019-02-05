@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity >=0.4.25 <0.6.0;
 
 import {PrimeTester} from "./PrimeTester.sol";
 
@@ -16,19 +16,19 @@ contract RSAAccumulator {
 
     PrimeTester public primeTester;
     event AccumulatorUpdated(uint256 indexed _coinID);
-    
+
     // constructor(uint256[NlengthIn32ByteLimbs] modulus) public {
     //     accumulator[NlengthIn32ByteLimbs - 1] = g;
     //     N = modulus;
     // }
 
-    constructor(bytes modulus) public {
+    constructor(bytes memory modulus) public {
         require(modulus.length == NlengthInBytes, "Modulus should be at least padded");
         uint256 limb = 0;
         uint256 dataLength = 0x20; // skip length;
         for (uint256 i = 0; i < NlengthIn32ByteLimbs; i++) {
             assembly {
-                limb := mload(add(modulus, dataLength))        
+                limb := mload(add(modulus, dataLength))
             }
             N[i] = limb;
             dataLength += 0x20;
@@ -37,16 +37,16 @@ contract RSAAccumulator {
     }
 
     function updateAccumulator(
-        uint256[NlengthIn32ByteLimbs] previousAccumulator,
-        uint256 _value) 
-    public view returns (uint256[NlengthIn32ByteLimbs] newAccumulator) {
+        uint256[NlengthIn32ByteLimbs] memory previousAccumulator,
+        uint256 _value)
+    public view returns (uint256[NlengthIn32ByteLimbs] memory newAccumulator) {
         newAccumulator = modularExp(previousAccumulator, _value, N);
     }
 
     function updateAccumulatorMultiple(
-        uint256[NlengthIn32ByteLimbs] previousAccumulator,
-        uint256[] _limbs) 
-    public view returns (uint256[NlengthIn32ByteLimbs] newAccumulator) {
+        uint256[NlengthIn32ByteLimbs] memory previousAccumulator,
+        uint256[] memory _limbs)
+    public view returns (uint256[NlengthIn32ByteLimbs] memory newAccumulator) {
         newAccumulator = modularExpVariableLength(previousAccumulator, _limbs, N);
     }
 
@@ -56,7 +56,7 @@ contract RSAAccumulator {
     //     // Sony's way to determine randomness :)
     //     return 11;
     // }
-    
+
     // function mapHashToPrime(bytes32 _hash) public
     // view
     // returns (uint256 prime) {
@@ -67,17 +67,17 @@ contract RSAAccumulator {
     function getN()
     public
     view
-    returns (uint256[NlengthIn32ByteLimbs] n) {
+    returns (uint256[NlengthIn32ByteLimbs] memory n) {
         return N;
     }
 
 
-    // // this is kind of Wesolowski scheme. 'x' parameter is some exponent to show that 
+    // // this is kind of Wesolowski scheme. 'x' parameter is some exponent to show that
     // // where g is an old accumulator (before inclusion of some coin), A is a final accumulator.
     // // A proof should be just 'r' and 'b', cause 'z' in this scheme is a new accumulator itself
     // function calculateProofWes(uint256 _coinID, uint256 x)
-    // public 
-    // view 
+    // public
+    // view
     // returns (uint256[NlengthIn32ByteLimbs] b, uint256[NlengthIn32ByteLimbs] z, uint256 r) {
     //     uint256[NlengthIn32ByteLimbs] memory nReadOnce = N;
     //     uint256[NlengthIn32ByteLimbs] memory h = modularExp(emptyAccumulator, mapCoinToPrime(_coinID), nReadOnce);
@@ -91,11 +91,11 @@ contract RSAAccumulator {
     // // vefity proof is Wesolowski scheme. Modular multiplication is not yet implemented, so proof can not be checked
     // function checkProofWes(
     //     uint256 _coinID,
-    //     uint256[NlengthIn32ByteLimbs] b, 
-    //     uint256[NlengthIn32ByteLimbs] z, 
+    //     uint256[NlengthIn32ByteLimbs] b,
+    //     uint256[NlengthIn32ByteLimbs] z,
     //     uint256 r)
-    // public 
-    // view 
+    // public
+    // view
     // returns (bool isValid) {
     //     uint256[NlengthIn32ByteLimbs] memory nReadOnce = N;
     //     uint256[NlengthIn32ByteLimbs] memory h = modularExp(emptyAccumulator, mapCoinToPrime(_coinID), nReadOnce);
@@ -114,9 +114,9 @@ contract RSAAccumulator {
     // assume that all primes are valid, etc
     function checkInclusionProof(
         uint64 prime,
-        uint256[] witnessLimbs,
-        uint256[NlengthIn32ByteLimbs] initialAccumulator,
-        uint256[NlengthIn32ByteLimbs] finalAccumulator
+        uint256[] memory witnessLimbs,
+        uint256[NlengthIn32ByteLimbs] memory initialAccumulator,
+        uint256[NlengthIn32ByteLimbs] memory finalAccumulator
     )
     public
     view
@@ -133,11 +133,11 @@ contract RSAAccumulator {
     // check that A*(g^r) = g^(x1*x2*...*xn)^cofactor
     // assume that all primes are valid, etc
     function checkNonInclusionProof(
-        uint64[] primes,
-        uint256[] rLimbs,
-        uint256[] cofactorLimbs,
-        uint256[NlengthIn32ByteLimbs] initialAccumulator,
-        uint256[NlengthIn32ByteLimbs] finalAccumulator
+        uint64[] memory primes,
+        uint256[] memory rLimbs,
+        uint256[] memory cofactorLimbs,
+        uint256[NlengthIn32ByteLimbs] memory initialAccumulator,
+        uint256[NlengthIn32ByteLimbs] memory finalAccumulator
     )
     public
     view
@@ -169,12 +169,12 @@ contract RSAAccumulator {
     }
 
     function modularMul4(
-        uint256[NlengthIn32ByteLimbs] _a,
-        uint256[NlengthIn32ByteLimbs] _b,
-        uint256[NlengthIn32ByteLimbs] _m)
-    public 
-    view 
-    returns (uint256[NlengthIn32ByteLimbs] c) {
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b,
+        uint256[NlengthIn32ByteLimbs] memory _m)
+    public
+    view
+    returns (uint256[NlengthIn32ByteLimbs] memory c) {
         uint256[NlengthIn32ByteLimbs] memory aPlusB = modularExp(modularAdd(_a, _b, _m), 2, _m);
         uint256[NlengthIn32ByteLimbs] memory aMinusB = modularExp(modularSub(_a, _b, _m), 2, _m);
         uint256[NlengthIn32ByteLimbs] memory t = modularSub(aPlusB, aMinusB, _m);
@@ -183,18 +183,18 @@ contract RSAAccumulator {
 
     // cheat and just do two additions
     function modularMulBy4(
-        uint256[NlengthIn32ByteLimbs] _a,
-        uint256[NlengthIn32ByteLimbs] _m)
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _m)
     public
     pure
-    returns (uint256[NlengthIn32ByteLimbs] c) {
+    returns (uint256[NlengthIn32ByteLimbs] memory c) {
         uint256[NlengthIn32ByteLimbs] memory t = modularAdd(_a, _a, _m);
         c = modularAdd(t, t, _m);
     }
 
     function compare(
-        uint256[NlengthIn32ByteLimbs] _a, 
-        uint256[NlengthIn32ByteLimbs] _b)
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b)
     public
     pure
     returns (int256 result) {
@@ -209,12 +209,12 @@ contract RSAAccumulator {
     }
 
     function wrappingSub(
-        uint256[NlengthIn32ByteLimbs] _a, 
-        uint256[NlengthIn32ByteLimbs] _b
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b
     )
     public
-    pure 
-    returns (uint256[NlengthIn32ByteLimbs] o) {
+    pure
+    returns (uint256[NlengthIn32ByteLimbs] memory o) {
         bool borrow = false;
         uint256 limb = 0;
         for (uint256 i = NlengthIn32ByteLimbs - 1; i < NlengthIn32ByteLimbs; i--) {
@@ -242,12 +242,12 @@ contract RSAAccumulator {
     }
 
     function wrappingAdd(
-        uint256[NlengthIn32ByteLimbs] _a, 
-        uint256[NlengthIn32ByteLimbs] _b
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b
     )
     public
-    pure 
-    returns (uint256[NlengthIn32ByteLimbs] o) {
+    pure
+    returns (uint256[NlengthIn32ByteLimbs] memory o) {
         bool carry = false;
         uint256 limb = 0;
         uint256 subaddition = 0;
@@ -277,12 +277,12 @@ contract RSAAccumulator {
     }
 
     function modularSub(
-        uint256[NlengthIn32ByteLimbs] _a, 
-        uint256[NlengthIn32ByteLimbs] _b,
-        uint256[NlengthIn32ByteLimbs] _m)
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b,
+        uint256[NlengthIn32ByteLimbs] memory _m)
     public
-    pure 
-    returns (uint256[NlengthIn32ByteLimbs] o) {
+    pure
+    returns (uint256[NlengthIn32ByteLimbs] memory o) {
         int256 comparison = compare(_a, _b);
         if (comparison == 0) {
             return o;
@@ -295,12 +295,12 @@ contract RSAAccumulator {
     }
 
     function modularAdd(
-        uint256[NlengthIn32ByteLimbs] _a, 
-        uint256[NlengthIn32ByteLimbs] _b,
-        uint256[NlengthIn32ByteLimbs] _m)
+        uint256[NlengthIn32ByteLimbs] memory _a,
+        uint256[NlengthIn32ByteLimbs] memory _b,
+        uint256[NlengthIn32ByteLimbs] memory _m)
     public
-    pure 
-    returns (uint256[NlengthIn32ByteLimbs] o) {
+    pure
+    returns (uint256[NlengthIn32ByteLimbs] memory o) {
         uint256[NlengthIn32ByteLimbs] memory space = wrappingSub(_m, _a);
         // see how much "space" has left before an overflow
         int256 comparison = compare(space, _b);
@@ -315,10 +315,10 @@ contract RSAAccumulator {
 
     // this assumes that exponent in never larger than 256 bits
     function modularExp(
-        uint256[NlengthIn32ByteLimbs] base, 
-        uint256 e, 
-        uint256[NlengthIn32ByteLimbs] m) 
-    public view returns (uint256[NlengthIn32ByteLimbs] output) {
+        uint256[NlengthIn32ByteLimbs] memory base,
+        uint256 e,
+        uint256[NlengthIn32ByteLimbs] memory m)
+    public view returns (uint256[NlengthIn32ByteLimbs] memory output) {
         uint256 modulusLength = NlengthInBytes;
         uint256 memoryPointer = 0;
         uint256 dataLength = 0;
@@ -346,7 +346,7 @@ contract RSAAccumulator {
         }
         dataLength += 0x20;
 
-        for (i = 0; i < NlengthIn32ByteLimbs; i++) {
+        for (uint256 i = 0; i < NlengthIn32ByteLimbs; i++) {
             limb = m[i];
             assembly {
                 mstore(add(memoryPointer, dataLength), limb)  // cycle over base
@@ -363,7 +363,7 @@ contract RSAAccumulator {
         }
         dataLength = 0;
         limb = 0;
-        for (i = 0; i < NlengthIn32ByteLimbs; i++) {
+        for (uint256 i = 0; i < NlengthIn32ByteLimbs; i++) {
             assembly {
                 limb := mload(add(memoryPointer, dataLength))
             }
@@ -375,10 +375,10 @@ contract RSAAccumulator {
 
     // this assumes that exponent in never larger than 256 bits
     function modularExpVariableLength(
-        uint256[NlengthIn32ByteLimbs] base, 
-        uint256[] e, 
-        uint256[NlengthIn32ByteLimbs] m) 
-    public view returns (uint256[NlengthIn32ByteLimbs] output) {
+        uint256[NlengthIn32ByteLimbs] memory base,
+        uint256[] memory e,
+        uint256[NlengthIn32ByteLimbs] memory m)
+    public view returns (uint256[NlengthIn32ByteLimbs] memory output) {
         uint256 modulusLength = NlengthInBytes;
         uint256 memoryPointer = 0;
         uint256 dataLength = 0;
@@ -402,7 +402,7 @@ contract RSAAccumulator {
             dataLength += 0x20;
         }
 
-        for (i = 0; i < exponentLimbs; i++) {
+        for (uint256 i = 0; i < exponentLimbs; i++) {
             limb = e[i];
             assembly {
                 mstore(add(memoryPointer, dataLength), limb)  // cycle over exponent
@@ -410,7 +410,7 @@ contract RSAAccumulator {
             dataLength += 0x20;
         }
 
-        for (i = 0; i < NlengthIn32ByteLimbs; i++) {
+        for (uint256 i = 0; i < NlengthIn32ByteLimbs; i++) {
             limb = m[i];
             assembly {
                 mstore(add(memoryPointer, dataLength), limb)  // cycle over base
@@ -427,7 +427,7 @@ contract RSAAccumulator {
         }
         dataLength = 0;
         limb = 0;
-        for (i = 0; i < NlengthIn32ByteLimbs; i++) {
+        for (uint256 i = 0; i < NlengthIn32ByteLimbs; i++) {
             assembly {
                 limb := mload(add(memoryPointer, dataLength))
             }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity >=0.4.25 <0.6.0;
 
 import {RSAAccumulator} from "./RSAAccumulator.sol";
 
@@ -25,12 +25,12 @@ contract PlasmaCashMockup {
     function getAccumulatorForBlock(uint64 blockNumber)
     public
     view
-    returns (uint256[NlengthIn32ByteLimbs] accum) {
+    returns (uint256[NlengthIn32ByteLimbs] memory accum) {
         accum = blockAccumulators[blockNumber];
     }
 
     function updateAccumulator(
-        uint256[] _limbs) 
+        uint256[] memory _limbs)
     public {
         blockAccumulators[lastBlock + 1] = rsaAccumulator.updateAccumulatorMultiple(blockAccumulators[lastBlock], _limbs);
         lastBlock++;
@@ -39,9 +39,9 @@ contract PlasmaCashMockup {
 
     function checkInclusionProof(
         uint64 prime,
-        uint256[] witnessLimbs,
-        uint256[NlengthIn32ByteLimbs] initialAccumulator,
-        uint256[NlengthIn32ByteLimbs] finalAccumulator
+        uint256[] memory witnessLimbs,
+        uint256[NlengthIn32ByteLimbs] memory initialAccumulator,
+        uint256[NlengthIn32ByteLimbs] memory finalAccumulator
     )
     public
     view
@@ -50,11 +50,11 @@ contract PlasmaCashMockup {
     }
 
     function checkNonInclusionProof(
-        uint64[] primes,
-        uint256[] rLimbs,
-        uint256[] cofactorLimbs,
-        uint256[NlengthIn32ByteLimbs] initialAccumulator,
-        uint256[NlengthIn32ByteLimbs] finalAccumulator
+        uint64[] memory primes,
+        uint256[] memory rLimbs,
+        uint256[] memory cofactorLimbs,
+        uint256[NlengthIn32ByteLimbs] memory initialAccumulator,
+        uint256[NlengthIn32ByteLimbs] memory finalAccumulator
     )
     public
     view
